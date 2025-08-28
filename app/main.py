@@ -35,3 +35,11 @@ app.include_router(users.router)
 @app.get("/", tags=["health"])
 async def root():
     return {"status": "ok", "app": settings.APP_NAME}
+
+# app/main.py
+from fastapi.staticfiles import StaticFiles  # NEW
+
+# ... существующий код выше
+
+# смонтируем папку со статикой на /app
+app.mount("/app", StaticFiles(directory="app/static", html=True), name="app")  # NEW
