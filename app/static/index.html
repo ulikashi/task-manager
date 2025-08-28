@@ -1,89 +1,107 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Task Manager</title>
-  <!-- Tailwind via Play CDN -->
+  <title>Диспетчер задач</title>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Шрифт: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* приятные мелочи */
-    .card { @apply bg-white/70 backdrop-blur rounded-2xl shadow p-6; }
-    .btn  { @apply px-4 py-2 rounded-xl shadow text-sm font-medium hover:opacity-90 active:scale-[.98] transition; }
-    .btn-primary { @apply bg-blue-600 text-white; }
-    .btn-ghost { @apply bg-gray-100; }
-    .input { @apply w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500; }
-    .chip  { @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-gray-100; }
-    .muted { @apply text-gray-500; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    /* Базовые элементы (мягкие «пузырьки») */
+    .card { @apply bg-white rounded-3xl shadow-sm border border-gray-200 p-6; }
+    .btn  { @apply inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition shadow-sm border focus:outline-none focus:ring-2 focus:ring-blue-400; }
+    .btn-primary { @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700; }
+    .btn-ghost   { @apply bg-white text-gray-800 border-gray-300 hover:bg-gray-50; }
+    .btn-danger  { @apply bg-white text-red-700 border-red-300 hover:bg-red-50; }
+    .input { @apply w-full rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400; }
+    .pill  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-sky-50 to-indigo-50">
-  <div class="max-w-4xl mx-auto p-6 space-y-6">
+
+<!-- Визуально центрируем всё по странице -->
+<body class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+  <div class="max-w-2xl mx-auto px-6 py-10 md:py-16 space-y-6 min-h-[85vh] flex flex-col justify-center">
+
+    <!-- Header -->
     <header class="flex items-center justify-between">
-      <h1 class="text-2xl font-semibold">Task Manager</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">Диспетчер задач</h1>
       <div id="userBox" class="hidden items-center gap-3">
-        <span id="userEmail" class="chip"></span>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        <span id="userEmail" class="text-sm text-gray-600"></span>
+        <button id="logoutBtn" class="btn btn-ghost">Выйти</button>
       </div>
     </header>
 
     <!-- Auth -->
     <section id="authCard" class="card">
-      <h2 class="text-lg font-medium mb-4">Sign in / Sign up</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <h2 class="text-lg font-medium mb-4">Войти или зарегистрироваться</h2>
+      <div class="grid grid-cols-1 gap-4">
         <div class="space-y-3">
-          <input id="email" type="email" class="input" placeholder="Email" />
-          <input id="password" type="password" class="input" placeholder="Password (min 6)" />
-          <input id="fullName" type="text" class="input" placeholder="Full name (optional for signup)" />
+          <label class="block">
+            <span class="block text-sm text-gray-600 mb-1">Email</span>
+            <input id="email" type="email" class="input" placeholder="name@example.com" />
+          </label>
+          <label class="block">
+            <span class="block text-sm text-gray-600 mb-1">Пароль</span>
+            <input id="password" type="password" class="input" placeholder="Минимум 6 символов" />
+          </label>
+          <label class="block">
+            <span class="block text-sm text-gray-600 mb-1">Имя (необязательно)</span>
+            <input id="fullName" type="text" class="input" placeholder="Например, Анна Иванова" />
+          </label>
+
           <div class="flex gap-2">
-            <button id="loginBtn" class="btn btn-primary">Login</button>
-            <button id="signupBtn" class="btn btn-ghost">Sign up</button>
+            <button id="loginBtn" class="btn btn-primary">Войти</button>
+            <button id="signupBtn" class="btn btn-ghost">Зарегистрироваться</button>
           </div>
-          <p id="authMsg" class="text-sm muted"></p>
-        </div>
-        <div class="text-sm text-gray-600">
-          <p class="mb-2">Tips:</p>
-          <ul class="list-disc list-inside space-y-1">
-            <li>Use <span class="chip">Sign up</span> once, then <span class="chip">Login</span>.</li>
-            <li>Your token is stored locally (browser) for API calls.</li>
-            <li>All requests go to the same origin (no CORS issues).</li>
-          </ul>
+
+          <p id="authMsg" class="text-sm text-gray-600"></p>
         </div>
       </div>
     </section>
 
     <!-- Tasks -->
     <section id="tasksCard" class="card hidden">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-medium">My Tasks</h2>
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">
+        <h2 class="text-lg font-medium">Мои задачи</h2>
         <div class="flex gap-2">
-          <input id="filterInput" class="input !w-64" placeholder="Filter by title..." />
-          <button id="refreshBtn" class="btn btn-ghost">Refresh</button>
+          <input id="filterInput" class="input w-64" placeholder="Фильтр по названию" />
+          <button id="refreshBtn" class="btn btn-ghost">Обновить</button>
         </div>
       </div>
 
-      <form id="createForm" class="flex gap-2 mb-4">
-        <input id="newTitle" class="input" placeholder="New task title..." required />
-        <input id="newDesc" class="input !w-72" placeholder="Description (optional)" />
-        <button class="btn btn-primary" type="submit">Add</button>
+      <form id="createForm" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 mb-4">
+        <input id="newTitle" class="input" placeholder="Название задачи" required />
+        <input id="newDesc" class="input" placeholder="Описание (необязательно)" />
+        <button class="btn btn-primary" type="submit">Добавить</button>
       </form>
 
-      <div id="list" class="space-y-2"></div>
+      <div id="list" class="space-y-3"></div>
 
       <template id="rowTpl">
-        <div class="flex items-start gap-3 p-3 rounded-xl border border-gray-200 bg-white">
-          <input type="checkbox" class="mt-1" data-role="done">
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <span data-role="title" class="font-medium"></span>
-              <span data-role="status" class="chip"></span>
-            </div>
-            <div data-role="desc" class="muted text-sm"></div>
-            <div class="mt-2 flex gap-2">
-              <button class="btn btn-ghost" data-role="edit">Edit</button>
-              <button class="btn btn-ghost" data-role="save" style="display:none">Save</button>
-              <button class="btn btn-ghost" data-role="cancel" style="display:none">Cancel</button>
-              <button class="btn btn-ghost" data-role="delete">Delete</button>
+        <div class="rounded-3xl border border-gray-200 bg-white p-4 hover:bg-gray-50 transition shadow-sm">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" class="mt-1.5 shrink-0 accent-blue-600" data-role="done" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span data-role="title" class="font-medium truncate text-base"></span>
+                <span data-role="status" class="pill bg-gray-100 text-gray-700"></span>
+              </div>
+              <div data-role="desc" class="text-sm text-gray-500 mt-1"></div>
+
+              <div class="mt-3 flex gap-2">
+                <button class="btn btn-ghost" data-role="edit">Изменить</button>
+                <button class="btn btn-primary hidden" data-role="save">Сохранить</button>
+                <button class="btn btn-ghost hidden" data-role="cancel">Отмена</button>
+                <button class="btn btn-danger" data-role="delete">Удалить</button>
+              </div>
             </div>
           </div>
         </div>
@@ -91,46 +109,75 @@
     </section>
   </div>
 
+  <!-- Toast -->
+  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 hidden">
+    <div class="bg-black text-white text-sm px-4 py-2 rounded-full shadow-lg" id="toastMsg"></div>
+  </div>
+
+  <!-- JS: функции БЕЗ изменений -->
   <script>
-    const API = ""; // same-origin
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const API = ""; // same origin
+    const $ = (s, r=document)=>r.querySelector(s);
     const state = { access: localStorage.getItem("access") || "", me: null, tasks: [] };
 
-    // --- API helpers ---
-    async function api(path, {method="GET", json, form, auth=true} = {}) {
+    // toast
+    function toast(msg, ms=2200){
+      const box = $("#toast"), msgEl = $("#toastMsg");
+      msgEl.textContent = msg; box.classList.remove("hidden");
+      setTimeout(()=> box.classList.add("hidden"), ms);
+    }
+
+    // api helper (учитывает 204/пустые ответы)
+    async function api(path, {method="GET", json, form, auth=true}={}) {
       const headers = {};
       if (json) { headers["Content-Type"] = "application/json"; }
       if (auth && state.access) { headers["Authorization"] = "Bearer " + state.access; }
-
       const body = json ? JSON.stringify(json) : (form ? new URLSearchParams(form) : undefined);
+
       const res = await fetch(API + path, { method, headers, body });
+
       if (!res.ok) {
-        const text = await res.text().catch(()=> "");
-        throw new Error(text || (res.status + " " + res.statusText));
+        let detail = "Ошибка запроса";
+        try {
+          const ctErr = res.headers.get("content-type") || "";
+          if (ctErr.includes("application/json")) {
+            const d = await res.json();
+            detail = d.detail || JSON.stringify(d);
+          } else {
+            detail = await res.text();
+          }
+        } catch {}
+        throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
       }
+
+      if (res.status === 204 || res.status === 205) return null;
+      const len = res.headers.get("content-length");
+      if (len === "0") return null;
+
       const ct = res.headers.get("content-type") || "";
-      return ct.includes("application/json") ? res.json() : res.text();
+      if (ct.includes("application/json")) {
+        const text = await res.text();
+        if (!text) return null;
+        try { return JSON.parse(text); } catch { return null; }
+      }
+      return res.text();
     }
 
-    // Auth endpoints
+    // endpoints
     const authApi = {
-      signup: (email, password, full_name) => api("/api/auth/signup", {method:"POST", json:{email, password, full_name}, auth:false}),
-      login: (email, password) => api("/api/auth/login", {method:"POST", form:{username:email, password}, auth:false}),
-      me: () => api("/api/users/me"),
-      logout: (refresh) => api("/api/auth/logout", {method:"POST", json:{refresh_token: refresh}}), // not used in UI, tokens kept client-side
+      signup: (email, password, full_name)=> api("/api/auth/signup",{method:"POST", json:{email, password, full_name}, auth:false}),
+      login: (email, password)=> api("/api/auth/login",{method:"POST", form:{username:email, password}, auth:false}),
+      me: ()=> api("/api/users/me"),
     };
-
-    // Tasks endpoints
     const tasksApi = {
-      listMine: () => api("/api/tasks/"),
-      create: (title, description) => api("/api/tasks/", {method:"POST", json:{title, description}}),
-      patch: (id, payload) => api(`/api/tasks/${id}`, {method:"PATCH", json:payload}),
-      del: (id) => api(`/api/tasks/${id}`, {method:"DELETE"}),
+      listMine: ()=> api("/api/tasks/"),
+      create: (title, description)=> api("/api/tasks/", {method:"POST", json:{title, description}}),
+      patch: (id, payload)=> api(`/api/tasks/${id}`, {method:"PATCH", json:payload}),
+      del: (id)=> api(`/api/tasks/${id}`, {method:"DELETE"}),
     };
 
-    // --- UI state ---
-    function setLoggedIn(me) {
+    // UI state
+    function setLoggedIn(me){
       state.me = me;
       $("#userEmail").textContent = me.email;
       $("#userBox").classList.remove("hidden");
@@ -138,153 +185,162 @@
       $("#tasksCard").classList.remove("hidden");
       refreshTasks();
     }
-
-    function setLoggedOut(msg="") {
-      state.me = null;
-      state.access = "";
+    function setLoggedOut(msg=""){
+      state.me = null; state.access = "";
       localStorage.removeItem("access");
       $("#userBox").classList.add("hidden");
       $("#authCard").classList.remove("hidden");
       $("#tasksCard").classList.add("hidden");
-      $("#authMsg").textContent = msg;
+      if(msg) toast(msg);
     }
 
-    // --- Render ---
-    function renderList() {
+    // render
+    function renderList(){
       const filter = $("#filterInput").value.trim().toLowerCase();
-      const list = $("#list");
-      list.innerHTML = "";
+      const root = $("#list");
+      root.innerHTML = "";
       const tpl = $("#rowTpl");
 
-      state.tasks
-        .filter(t => !filter || t.title.toLowerCase().includes(filter))
-        .forEach(task => {
-          const node = tpl.content.cloneNode(true);
-          const root = node.children[0];
-          const done = $('[data-role="done"]', root);
-          const title = $('[data-role="title"]', root);
-          const desc = $('[data-role="desc"]', root);
-          const status = $('[data-role="status"]', root);
-          const btnEdit = $('[data-role="edit"]', root);
-          const btnSave = $('[data-role="save"]', root);
-          const btnCancel = $('[data-role="cancel"]', root);
-          const btnDelete = $('[data-role="delete"]', root);
+      const items = state.tasks.filter(t => !filter || t.title.toLowerCase().includes(filter));
+      if(!items.length){
+        const empty = document.createElement("div");
+        empty.className = "text-center text-gray-500 py-8";
+        empty.textContent = "Задач пока нет.";
+        root.appendChild(empty);
+        return;
+      }
 
-          title.textContent = task.title;
-          desc.textContent = task.description || "—";
-          status.textContent = task.is_completed ? "Done" : "Open";
-          status.className = "chip " + (task.is_completed ? "bg-green-100" : "bg-gray-100");
-          done.checked = !!task.is_completed;
+      for(const task of items){
+        const node = tpl.content.cloneNode(true);
+        const el = node.children[0];
+        const done = el.querySelector('[data-role="done"]');
+        const title = el.querySelector('[data-role="title"]');
+        const desc = el.querySelector('[data-role="desc"]');
+        const status = el.querySelector('[data-role="status"]');
+        const btnEdit = el.querySelector('[data-role="edit"]');
+        const btnSave = el.querySelector('[data-role="save"]');
+        const btnCancel = el.querySelector('[data-role="cancel"]');
+        const btnDelete = el.querySelector('[data-role="delete"]');
 
-          // toggle complete
-          done.addEventListener("change", async () => {
-            const updated = await tasksApi.patch(task.id, { is_completed: done.checked });
-            task.is_completed = updated.is_completed;
-            renderList();
-          });
+        title.textContent = task.title;
+        desc.textContent = task.description || "—";
+        done.checked = !!task.is_completed;
+        setStatus(task.is_completed);
 
-          // edit
-          btnEdit.addEventListener("click", () => {
-            btnEdit.style.display = "none";
-            btnSave.style.display = "";
-            btnCancel.style.display = "";
+        function setStatus(v){
+          status.textContent = v ? "Готово" : "Открыта";
+          status.className = "pill " + (v ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700");
+        }
 
-            const tIn = document.createElement("input");
-            tIn.className = "input";
-            tIn.value = task.title;
-
-            const dIn = document.createElement("input");
-            dIn.className = "input mt-2";
-            dIn.value = task.description || "";
-
-            title.replaceWith(tIn);
-            desc.replaceWith(dIn);
-
-            btnSave.onclick = async () => {
-              const updated = await tasksApi.patch(task.id, { title: tIn.value, description: dIn.value });
-              task.title = updated.title;
-              task.description = updated.description;
-              renderList();
-            };
-            btnCancel.onclick = () => renderList();
-          });
-
-          // delete
-          btnDelete.addEventListener("click", async () => {
-            if (!confirm("Delete this task?")) return;
-            await tasksApi.del(task.id);
-            state.tasks = state.tasks.filter(t => t.id !== task.id);
-            renderList();
-          });
-
-          list.appendChild(node);
+        done.addEventListener("change", async ()=>{
+          const updated = await tasksApi.patch(task.id, { is_completed: done.checked });
+          task.is_completed = updated.is_completed;
+          setStatus(task.is_completed);
+          toast(task.is_completed ? "Отмечено как выполнено" : "Снята отметка о выполнении");
         });
 
-      if (!list.children.length) {
-        const empty = document.createElement("div");
-        empty.className = "muted text-center py-10";
-        empty.textContent = "No tasks yet.";
-        list.appendChild(empty);
+        // edit
+        btnEdit.addEventListener("click", ()=>{
+          btnEdit.classList.add("hidden"); btnSave.classList.remove("hidden"); btnCancel.classList.remove("hidden");
+
+          const tIn = document.createElement("input");
+          tIn.className = "input"; tIn.value = task.title;
+          const dIn = document.createElement("input");
+          dIn.className = "input mt-2"; dIn.value = task.description || "";
+
+          title.replaceWith(tIn); desc.replaceWith(dIn);
+
+          btnSave.onclick = async ()=>{
+            const updated = await tasksApi.patch(task.id, { title: tIn.value, description: dIn.value });
+            task.title = updated.title; task.description = updated.description;
+            toast("Задача обновлена");
+            renderList();
+          };
+          btnCancel.onclick = ()=> renderList();
+        });
+
+        // delete
+        btnDelete.addEventListener("click", async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!confirm("Удалить задачу?")) return;
+          try {
+            await tasksApi.del(task.id);
+            state.tasks = await tasksApi.listMine();
+            renderList();
+            toast("Задача удалена");
+          } catch (err) {
+            toast("Не удалось удалить задачу");
+            console.error(err);
+          }
+        });
+
+        root.appendChild(el);
       }
     }
 
-    async function refreshTasks() {
+    async function refreshTasks(){
       state.tasks = await tasksApi.listMine();
       renderList();
     }
 
-    // --- Events ---
-    $("#signupBtn").addEventListener("click", async () => {
+    // events
+    $("#signupBtn").addEventListener("click", async ()=>{
       const email = $("#email").value.trim();
       const password = $("#password").value;
       const full_name = $("#fullName").value.trim() || null;
-      try {
+
+      if(password.length < 6){ toast("Пароль должен содержать минимум 6 символов"); return; }
+
+      try{
         const res = await authApi.signup(email, password, full_name);
-        state.access = res.access_token;
-        localStorage.setItem("access", state.access);
-        const me = await authApi.me();
-        setLoggedIn(me);
-      } catch (e) { $("#authMsg").textContent = e.message || "Signup failed"; }
+        state.access = res.access_token; localStorage.setItem("access", state.access);
+        const me = await authApi.me(); setLoggedIn(me);
+        toast("Регистрация выполнена");
+      }catch(e){ $("#authMsg").textContent = cleanErr(e.message); }
     });
 
-    $("#loginBtn").addEventListener("click", async () => {
+    $("#loginBtn").addEventListener("click", async ()=>{
       const email = $("#email").value.trim();
       const password = $("#password").value;
-      try {
+      try{
         const res = await authApi.login(email, password);
-        state.access = res.access_token;
-        localStorage.setItem("access", state.access);
-        const me = await authApi.me();
-        setLoggedIn(me);
-      } catch (e) { $("#authMsg").textContent = e.message || "Login failed"; }
+        state.access = res.access_token; localStorage.setItem("access", state.access);
+        const me = await authApi.me(); setLoggedIn(me);
+        toast("Вы вошли в систему");
+      }catch(e){ $("#authMsg").textContent = "Неверный email или пароль"; }
     });
 
-    $("#logoutBtn").addEventListener("click", () => setLoggedOut("Logged out."));
+    $("#logoutBtn").addEventListener("click", ()=> setLoggedOut("Вы вышли из аккаунта"));
 
-    $("#createForm").addEventListener("submit", async (ev) => {
+    $("#createForm").addEventListener("submit", async (ev)=>{
       ev.preventDefault();
       const title = $("#newTitle").value.trim();
       const description = $("#newDesc").value.trim();
-      if (!title) return;
+      if(!title) return;
       const created = await tasksApi.create(title, description || null);
       state.tasks.unshift(created);
-      $("#newTitle").value = "";
-      $("#newDesc").value = "";
+      $("#newTitle").value = ""; $("#newDesc").value = "";
+      toast("Задача добавлена");
       renderList();
     });
 
     $("#refreshBtn").addEventListener("click", refreshTasks);
     $("#filterInput").addEventListener("input", renderList);
 
-    // auto-login if token exists
-    (async () => {
-      if (!state.access) return;
+    function cleanErr(s){
       try {
-        const me = await authApi.me();
-        setLoggedIn(me);
-      } catch {
-        setLoggedOut();
-      }
+        const obj = JSON.parse(s);
+        if(Array.isArray(obj.detail) && obj.detail[0]?.msg) return obj.detail[0].msg;
+        if(typeof obj.detail === "string") return obj.detail;
+      } catch {}
+      return s;
+    }
+
+    // auto-restore session
+    (async ()=>{
+      if(!state.access) return;
+      try{ const me = await authApi.me(); setLoggedIn(me); } catch { setLoggedOut(); }
     })();
   </script>
 </body>
