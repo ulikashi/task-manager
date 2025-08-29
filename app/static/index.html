@@ -15,6 +15,12 @@
 
   <style>
     body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    /* Softer surfaces & chips */
+    .surface { @apply bg-white rounded-3xl shadow-sm border border-gray-200; }
+    .chip    { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-700; }
+    .muted   { @apply text-gray-500; }
+    .section { @apply text-lg font-medium text-gray-900; }
+    .toolbar { @apply flex gap-2 items-center; }
     /* Базовые элементы (мягкие «пузырьки») */
     .card { @apply bg-white rounded-3xl shadow-sm border border-gray-200 p-6; }
     .btn  { @apply inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition shadow-sm border focus:outline-none focus:ring-2 focus:ring-blue-400; }
@@ -23,16 +29,21 @@
     .btn-danger  { @apply bg-white text-red-700 border-red-300 hover:bg-red-50; }
     .input { @apply w-full rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400; }
     .pill  { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
+    /* Colored chips and card accents for visual clarity */
+    .chip-open { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+    .chip-done { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+    .card-open { @apply border-l-4 border-blue-300; }
+    .card-done { @apply border-l-4 border-emerald-300; }
   </style>
 </head>
 
 <!-- Визуально центрируем всё по странице -->
 <body class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-  <div class="max-w-2xl mx-auto px-6 py-10 md:py-16 space-y-6 min-h-[85vh] flex flex-col justify-center">
+  <div class="max-w-xl mx-auto px-5 py-10 md:py-16 space-y-6 min-h-[85vh] flex flex-col justify-center">
 
     <!-- Header -->
     <header class="flex items-center justify-between">
-      <h1 class="text-2xl font-semibold tracking-tight">Диспетчер задач</h1>
+      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">Диспетчер задач</h1>
       <div id="userBox" class="hidden items-center gap-3">
         <span id="userEmail" class="text-sm text-gray-600"></span>
         <button id="logoutBtn" class="btn btn-ghost">Выйти</button>
@@ -70,29 +81,29 @@
     <!-- Tasks -->
     <section id="tasksCard" class="card hidden">
       <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">
-        <h2 class="text-lg font-medium">Мои задачи</h2>
-        <div class="flex gap-2">
-          <input id="filterInput" class="input w-64" placeholder="Фильтр по названию" />
+        <h2 class="section">Мои задачи</h2>
+        <div class="toolbar">
+          <input id="filterInput" class="input w-64 placeholder-gray-400" placeholder="Фильтр по названию" />
           <button id="refreshBtn" class="btn btn-ghost">Обновить</button>
         </div>
       </div>
 
       <form id="createForm" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 mb-4">
-        <input id="newTitle" class="input" placeholder="Название задачи" required />
-        <input id="newDesc" class="input" placeholder="Описание (необязательно)" />
-        <button class="btn btn-primary" type="submit">Добавить</button>
+        <input id="newTitle" class="input placeholder-gray-400" placeholder="Название задачи" required />
+        <input id="newDesc" class="input placeholder-gray-400" placeholder="Описание (необязательно)" />
+        <button class="btn btn-primary shadow" type="submit">Добавить</button>
       </form>
 
       <div id="list" class="space-y-3"></div>
 
       <template id="rowTpl">
-        <div class="rounded-3xl border border-gray-200 bg-white p-4 hover:bg-gray-50 transition shadow-sm">
+        <div class="surface p-4 hover:bg-gray-50 transition">
           <div class="flex items-start gap-3">
             <input type="checkbox" class="mt-1.5 shrink-0 accent-blue-600" data-role="done" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <span data-role="title" class="font-medium truncate text-base"></span>
-                <span data-role="status" class="pill bg-gray-100 text-gray-700"></span>
+                <span data-role="status" class="chip"></span>
               </div>
               <div data-role="desc" class="text-sm text-gray-500 mt-1"></div>
 
@@ -204,7 +215,7 @@
       const items = state.tasks.filter(t => !filter || t.title.toLowerCase().includes(filter));
       if(!items.length){
         const empty = document.createElement("div");
-        empty.className = "text-center text-gray-500 py-8";
+        empty.className = "text-center muted py-10";
         empty.textContent = "Задач пока нет.";
         root.appendChild(empty);
         return;
@@ -229,7 +240,11 @@
 
         function setStatus(v){
           status.textContent = v ? "Готово" : "Открыта";
-          status.className = "pill " + (v ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700");
+          // colored chip styles
+          status.className = v ? "chip chip-done" : "chip chip-open";
+          // card left accent for quick scanning
+          el.classList.remove("card-open", "card-done");
+          el.classList.add(v ? "card-done" : "card-open");
         }
 
         done.addEventListener("change", async ()=>{
